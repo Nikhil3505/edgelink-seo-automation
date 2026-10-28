@@ -1,16 +1,17 @@
-# EdgeLink Technology - SEO Automation Dashboard
+# EdgeLink SEO Automation Dashboard
 
-Full-stack SEO audit platform designed to automate website crawling, technical and on-page signal extraction, AI-driven recommendations via Claude API, and automated PDF report distribution.
+Full-stack, autonomous SEO audit and recommendation platform built with **Next.js 14 App Router**, **BullMQ distributed job queues**, **Cheerio headless crawlers**, and **Claude AI synthesis**. Automatically crawls web pages, extracts technical and on-page signals, runs algorithmic heuristics, and generates executive-grade PDF reports with actionable fixes and falsifiability validation criteria.
 
 ---
 
 ## Architecture Overview
 
-The system consists of:
-1. **Frontend Presentation Layer**: Built with Next.js 14 App Router and Tailwind CSS, featuring an Internal Admin Portal (`/admin`) for queue monitoring and audit dispatch, alongside a Client Dashboard (`/client`) for executive metrics visualization.
-2. **Asynchronous Job Queue**: Powered by BullMQ and Redis (`seo-audit-jobs` queue) with real-time step progress reporting.
+The system is architected into modular decoupled components:
+
+1. **Frontend Presentation Layer**: Built using Next.js 14 App Router and Tailwind CSS, featuring an **Internal Admin Portal** (`/admin`) for queue monitoring and audit job dispatch, alongside a **Client Dashboard** (`/client`) for executive metric visualization.
+2. **Asynchronous Job Queue**: Powered by BullMQ and Redis (`seo-audit-jobs` queue) providing non-blocking execution and real-time step-by-step progress telemetry.
 3. **Headless Crawler Engine**: Serverless-compatible Fetch + Cheerio pipeline extracting HTML, meta tags, heading hierarchies, images alt text, and Schema.org JSON-LD structures.
-4. **Integration Layer**: Configurable live and mock drivers for Google PageSpeed Insights, Google Search Console, DataForSEO SERP rankings, and Twilio WhatsApp delivery.
+4. **Integration Layer**: Multi-source telemetry engine ingesting Core Web Vitals (PageSpeed Insights), Google Search Console search queries/impressions, DataForSEO SERP rankings, and Twilio WhatsApp delivery. Supports both live production credentials and isolated mock drivers.
 5. **AI Recommendation Engine**: Anthropic Claude API executing domain-tailored SEO audits using a parameterized master prompt and structured JSON schema.
 6. **Data Persistence**: Prisma ORM with Supabase / Neon PostgreSQL support, and local fallback storage for development environments.
 7. **Report Generation**: Vector PDF generator producing multi-page executive audit reports with health grades and falsifiability validation criteria.
@@ -19,7 +20,7 @@ The system consists of:
 
 ## Audit Pipeline Sequence
 
-Audits follow a strict 7-step sequence before generating reports and dispatching alerts:
+Audits execute through a strict 7-step sequence before generating reports and dispatching alerts:
 
 ```
 [Trigger] Admin On-Demand Click / External Cron Endpoint (/api/cron)
@@ -114,8 +115,8 @@ Audits follow a strict 7-step sequence before generating reports and dispatching
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone <repository-url>
-cd Edgelink_ai-developer
+git clone https://github.com/Nikhil3505/edgelink-seo-automation.git
+cd edgelink-seo-automation
 npm install
 ```
 
@@ -126,14 +127,14 @@ cp .env.example .env
 ```
 
 Key environment variables:
-- `USE_MOCKS`: Set to `true` (default) to run on mock data without external API costs, or `false` to enable live external APIs.
+- `USE_MOCKS`: Set to `true` (default) to run with mock telemetry drivers, or `false` to connect live APIs.
 - `DATABASE_URL`: PostgreSQL connection string (Supabase or Neon).
 - `UPSTASH_REDIS_URL` / `REDIS_URL`: Redis connection string for BullMQ.
 - `ANTHROPIC_API_KEY`: Anthropic API key for Claude 3.5 Sonnet queries.
 - `PORT`: Development server port (default `3000`).
 
 ### 3. Database Migration
-To sync the Prisma schema with Supabase or Neon:
+To sync the Prisma schema with your PostgreSQL database:
 ```bash
 npx prisma generate
 npx prisma db push
@@ -174,16 +175,16 @@ npm run worker
 
 ---
 
-## Submission Details
+## Production Deployment
 
-- **Target Position**: AI Developer & Automation Engineer
-- **Recipient**: hr@edgelinktechnology.com
-- **Subject**: Technical Assessment - AI Developer - [Your Full Name]
-- **Deliverables**:
-  1. GitHub repository URL (including all source code, README.md, and .env.example).
-  2. 3 to 5-minute screen recording demonstrating:
-     - Job enqueue in BullMQ
-     - Real-time progress updates in the Admin Portal
-     - Claude JSON response structure
-     - Database persistence
-     - Generated PDF report download
+The platform is designed for serverless or containerized deployment:
+- **Web & API Routes**: Deployable directly to Vercel or any Node.js hosting platform.
+- **Queue & Workers**: Compatible with serverless Redis (Upstash) or dedicated Redis instances with standalone worker nodes.
+- **Database**: PostgreSQL hosted on Supabase, Neon, or AWS RDS.
+- **Scheduled Audits**: Can be integrated with external cron pingers (`cron-job.org` or Cloudflare Workers) via the authenticated `/api/cron` endpoint.
+
+---
+
+## License
+
+MIT License. Designed and developed by Nikhil Sanjay Patil.
