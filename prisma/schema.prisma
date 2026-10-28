@@ -1,0 +1,89 @@
+// Prisma Schema for Edgelink SEO Automation Dashboard
+// Section 5: Supabase / Neon (PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id           String   @id @default(uuid())
+  name         String
+  websiteUrl   String
+  businessType String   @default("Dental Clinic")
+  city         String   @default("Pune")
+  state        String   @default("Maharashtra")
+  country      String   @default("India")
+  phone        String?
+  email        String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  audits Audit[]
+
+  @@map("clients")
+}
+
+model Audit {
+  id               String    @id @default(uuid())
+  clientId         String?
+  client           Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  url              String
+  status           String    @default("QUEUED") // QUEUED | CRAWLING | PAGESPEED | GSC | SCHEMA | ONPAGE | ROBOTS | DATAFORSEO | AI_ANALYSIS | GENERATING_PDF | COMPLETED | FAILED
+  progress         Int       @default(0) // 0 - 100
+  currentStep      String?
+  overallScore     Int?
+  scoreBreakdown   Json? // { technical: 0-100, on_page: 0-100, content: 0-100, core_web_vitals: 0-100, schema: 0-100 }
+  criticalIssues   Json? // string[]
+  importantIssues  Json? // string[]
+  quickWins        Json? // string[]
+  recommendations  Json? // Array of recommendation objects
+  executiveSummary String?
+  rawSignals       Json? // on_page, technical, cwv, schema, gsc, rankings
+  pdfPath          String?
+  whatsappStatus   String?
+  errorMessage     String?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  jobs AuditJob[]
+
+  @@map("audits")
+}
+
+model AuditJob {
+  id        String   @id @default(uuid())
+  auditId   String
+  audit     Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  bullJobId String?
+  queueName String   @default("seo-audit-jobs")
+  status    String   @default("waiting") // waiting | active | completed | failed
+  attempts  Int      @default(0)
+  logs      Json?
+  error     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("audit_jobs")
+}
+
+model ScheduledCron {
+  id             String    @id @default(uuid())
+  name           String
+  targetUrl      String
+  cronExpression String    @default("0 0 1 * *") // Monthly by default
+  enabled        Boolean   @default(true)
+  lastRunAt      DateTime?
+  nextRunAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("scheduled_crons")
+}
