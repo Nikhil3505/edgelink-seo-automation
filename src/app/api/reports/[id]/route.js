@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 const fs = require('fs');
 const path = require('path');
 const { db } = require('@/lib/db');
+const { generatePdfReport } = require('@/reports/pdf-generator');
 
 // GET /api/reports/[id] - Stream or download generated PDF
 export async function GET(request, { params }) {
@@ -14,13 +15,28 @@ export async function GET(request, { params }) {
     }
 
     const fileName = `seo-audit-${id}.pdf`;
-    const filePath = path.join(process.cwd(), 'public', 'reports', fileName);
+    const searchPaths = [
+      path.join('/tmp', 'reports', fileName),
+      path.join(process.cwd(), 'public', 'reports', fileName)
+    ];
 
-    if (!fs.existsSync(filePath)) {
+    let foundPath = searchPaths.find((p) => fs.existsSync(p));
+
+    if (!foundPath) {
+      try {
+        const client = audit.clientId ? await db.client.findUnique({ where: { id: audit.clientId } }) : null;
+        await generatePdfReport(audit, client);
+        foundPath = searchPaths.find((p) => fs.existsSync(p));
+      } catch (genErr) {
+        console.warn('PDF generation on demand failed:', genErr.message);
+      }
+    }
+
+    if (!foundPath || !fs.existsSync(foundPath)) {
       return NextResponse.json({ success: false, error: 'PDF report not generated yet' }, { status: 404 });
     }
 
-    const fileBuffer = fs.readFileSync(filePath);
+    const fileBuffer = fs.readFileSync(foundPath);
 
     return new Response(fileBuffer, {
       status: 200,

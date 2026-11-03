@@ -6,15 +6,31 @@ const PDFDocument = require('pdfkit');
  * PDF Report Generator
  * Generates an executive-ready, highly polished PDF report for the SEO Audit.
  */
-async function generatePdfReport(audit, client) {
-  const reportsDir = path.join(process.cwd(), 'public', 'reports');
-  if (!fs.existsSync(reportsDir)) {
-    fs.mkdirSync(reportsDir, { recursive: true });
-  }
+function getReportsDirectory() {
+  const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+  const primaryDir = isServerless
+    ? path.join('/tmp', 'reports')
+    : path.join(process.cwd(), 'public', 'reports');
 
+  try {
+    if (!fs.existsSync(primaryDir)) {
+      fs.mkdirSync(primaryDir, { recursive: true });
+    }
+    return primaryDir;
+  } catch (e) {
+    const fallbackDir = path.join('/tmp', 'reports');
+    if (!fs.existsSync(fallbackDir)) {
+      fs.mkdirSync(fallbackDir, { recursive: true });
+    }
+    return fallbackDir;
+  }
+}
+
+async function generatePdfReport(audit, client) {
+  const reportsDir = getReportsDirectory();
   const fileName = `seo-audit-${audit.id}.pdf`;
   const filePath = path.join(reportsDir, fileName);
-  const publicUrl = `/reports/${fileName}`;
+  const publicUrl = `/api/reports/${audit.id}`;
 
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({

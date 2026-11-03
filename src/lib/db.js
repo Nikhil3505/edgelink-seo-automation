@@ -2,11 +2,39 @@ const fs = require('fs');
 const path = require('path');
 
 // Safe file-based fallback storage if no remote Postgres database is connected yet
-const STORAGE_FILE = path.join(process.cwd(), 'local-db.json');
+const BUNDLED_STORAGE_FILE = path.join(process.cwd(), 'local-db.json');
+const TMP_STORAGE_FILE = path.join('/tmp', 'local-db.json');
+
+// In-memory cache fallback to ensure operations succeed even if disk writes fail
+let memoryStore = null;
+
+function getStoragePath() {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return TMP_STORAGE_FILE;
+  }
+  return BUNDLED_STORAGE_FILE;
+}
 
 function readLocalDb() {
+  if (memoryStore) {
+    return memoryStore;
+  }
+
+  const targetFile = getStoragePath();
   try {
-    if (!fs.existsSync(STORAGE_FILE)) {
+    if (!fs.existsSync(targetFile)) {
+      if (fs.existsSync(BUNDLED_STORAGE_FILE)) {
+        try {
+          const rawBundled = fs.readFileSync(BUNDLED_STORAGE_FILE, 'utf8');
+          const parsed = JSON.parse(rawBundled);
+          try {
+            fs.writeFileSync(targetFile, rawBundled);
+          } catch (_) {}
+          memoryStore = parsed;
+          return parsed;
+        } catch (_) {}
+      }
+
       const initialData = {
         clients: [
           {
@@ -39,21 +67,37 @@ function readLocalDb() {
           }
         ]
       };
-      fs.writeFileSync(STORAGE_FILE, JSON.stringify(initialData, null, 2));
+      try {
+        fs.writeFileSync(targetFile, JSON.stringify(initialData, null, 2));
+      } catch (_) {}
+      memoryStore = initialData;
       return initialData;
     }
-    const raw = fs.readFileSync(STORAGE_FILE, 'utf8');
-    return JSON.parse(raw);
+    const raw = fs.readFileSync(targetFile, 'utf8');
+    const data = JSON.parse(raw);
+    memoryStore = data;
+    return data;
   } catch (e) {
-    return { clients: [], audits: [], auditJobs: [], scheduledCrons: [] };
+    const fallback = { clients: [], audits: [], auditJobs: [], scheduledCrons: [] };
+    memoryStore = fallback;
+    return fallback;
   }
 }
 
 function writeLocalDb(data) {
+  memoryStore = data;
+  const targetFile = getStoragePath();
   try {
-    fs.writeFileSync(STORAGE_FILE, JSON.stringify(data, null, 2));
+    fs.writeFileSync(targetFile, JSON.stringify(data, null, 2));
   } catch (e) {
-    console.error('Failed to write local database file:', e);
+    // If targetFile fails (e.g. read-only file system on Vercel), attempt /tmp
+    if (targetFile !== TMP_STORAGE_FILE) {
+      try {
+        fs.writeFileSync(TMP_STORAGE_FILE, JSON.stringify(data, null, 2));
+        return;
+      } catch (_) {}
+    }
+    console.warn('[DB Fallback] Disk write failed, persisted in memory:', e.message);
   }
 }
 

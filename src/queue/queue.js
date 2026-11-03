@@ -44,14 +44,29 @@ async function enqueueAuditJob(jobData) {
   }
 
   // Resilient In-Process Queue Fallback (ensures 100% functionality even before user configures Upstash Redis)
-  console.log(`[Queue Runner] Processing job ${jobId} asynchronously...`);
-  setTimeout(async () => {
+  console.log(`[Queue Runner] Processing job ${jobId}...`);
+  if (process.env.VERCEL && !bullQueue) {
+    // In serverless environment without Redis, process inline before lambda freeze
     try {
       await processAuditJob(jobData);
+      return {
+        jobId,
+        queue: QUEUE_NAME,
+        mode: 'serverless-inline-sync',
+        completed: true
+      };
     } catch (err) {
-      console.error(`[In-Process Job Error] Job ${jobId} failed:`, err.message);
+      console.error(`[Serverless Job Error] Job ${jobId} failed:`, err.message);
     }
-  }, 100);
+  } else {
+    setTimeout(async () => {
+      try {
+        await processAuditJob(jobData);
+      } catch (err) {
+        console.error(`[In-Process Job Error] Job ${jobId} failed:`, err.message);
+      }
+    }, 100);
+  }
 
   return {
     jobId,
