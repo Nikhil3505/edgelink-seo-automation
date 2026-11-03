@@ -3,7 +3,7 @@ const mockData = require('../mocks/pagespeed.mock');
 
 /**
  * PageSpeed Insights integration
- * Follows integration pattern specified in Section 2.2 of EdgeLink Assessment
+ * Follows integration pattern specified in technical audit specifications
  */
 async function getPageSpeed(url) {
   if (USE_MOCKS) {

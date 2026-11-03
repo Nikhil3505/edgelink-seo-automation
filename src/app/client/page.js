@@ -72,7 +72,7 @@ export default function ClientDashboard() {
         <div className="space-y-2">
           <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>AI Executive SEO Audit Report • v1.0</span>
+            <span>AI Executive SEO Audit Report • Developed by Nikhil Patil</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">

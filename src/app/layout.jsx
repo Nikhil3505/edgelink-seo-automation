@@ -3,16 +3,22 @@ import Link from 'next/link';
 import { Activity, ShieldCheck, LayoutDashboard, Terminal, CheckCircle2 } from 'lucide-react';
 
 export const metadata = {
-  title: 'EdgeLink Technology — SEO Automation Dashboard',
-  description: 'AI-Powered Full-Stack SEO Audit Automation Platform (Next.js 14 + BullMQ + Claude API)',
+  title: 'SEO Automation Dashboard — Developed by Nikhil Patil',
+  description: 'AI-Powered Full-Stack SEO Audit Automation Platform — Developed by Nikhil Patil (Next.js 14 + BullMQ + Claude API)',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="antialiased selection:bg-brand-500 selection:text-white">
+      <body className="antialiased selection:bg-brand-500 selection:text-white relative">
+        {/* Persistent Floating Watermark Badge */}
+        <div className="fixed bottom-4 right-4 z-50 bg-slate-900/90 backdrop-blur-md text-white text-xs px-3.5 py-1.5 rounded-full shadow-xl border border-slate-700 font-medium flex items-center space-x-1.5 pointer-events-none select-none">
+          <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+          <span>Developed by Nikhil Patil</span>
+        </div>
+
         {/* Navigation Bar */}
-        <header className="sticky top-0 z-50 glass-panel border-b border-slate-200">
+        <header className="sticky top-0 z-40 glass-panel border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Link href="/" className="flex items-center space-x-2 group">
@@ -20,9 +26,9 @@ export default function RootLayout({ children }) {
                   <Activity className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="font-bold text-slate-900 tracking-tight text-lg">EDGELINK</span>
-                  <span className="text-brand-600 font-semibold text-xs ml-1.5 px-2 py-0.5 rounded-full bg-brand-50 border border-brand-200">
-                    SEO AI
+                  <span className="font-bold text-slate-900 tracking-tight text-lg">SEO AUTOMATION</span>
+                  <span className="text-brand-700 font-semibold text-xs ml-1.5 px-2 py-0.5 rounded-full bg-brand-50 border border-brand-200">
+                    By Nikhil Patil
                   </span>
                 </div>
               </Link>
@@ -64,7 +70,7 @@ export default function RootLayout({ children }) {
         {/* Footer */}
         <footer className="border-t border-slate-200 bg-white/50 py-6 text-xs text-slate-500 text-center">
           <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p>© 2026 EdgeLink Technology. SEO Automation Dashboard.</p>
+            <p>Developed by Nikhil Patil • SEO Automation Dashboard</p>
             <p className="flex items-center space-x-1 text-slate-400">
               <ShieldCheck className="w-4 h-4 text-brand-600" />
               <span>Next.js 14 • BullMQ • Claude API • Supabase/Neon</span>

@@ -174,7 +174,10 @@ export default function AdminPortal() {
             <span className="p-1.5 rounded-lg bg-slate-900 text-brand-400">
               <Terminal className="w-5 h-5" />
             </span>
-            <h1 className="text-2xl font-bold text-slate-900">EdgeLink Admin Portal</h1>
+            <h1 className="text-2xl font-bold text-slate-900">SEO Automation Admin Portal</h1>
+            <span className="text-xs px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200 font-medium">
+              Developed by Nikhil Patil
+            </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
             Audit Job Queue Runner • BullMQ (seo-audit-jobs) • 7-Step Crawl Pipeline Telemetry

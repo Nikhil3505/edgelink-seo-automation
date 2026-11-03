@@ -24,7 +24,7 @@ export default function HomePage() {
       <div className="text-center space-y-6 max-w-4xl mx-auto">
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold tracking-wide uppercase">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>EdgeLink Technology • SEO Automation System</span>
+          <span>Developed by Nikhil Patil • Autonomous SEO System</span>
         </div>
 
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight">
